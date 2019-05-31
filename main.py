@@ -2,6 +2,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+def letThereBeLife(frameNum, img, grid, object_grid):
+    for rows in object_grid:
+        for cell in rows:
+            total = cell.countNeighbors(grid, cell.row, cell.col)
+            if cell.color == 255:
+                if (total < 2) or (total > 3):
+                    cell.color = 0
+            else:
+                if total == 3:
+                    cell.color = 255
+                    # update data
+            grid[cell.row, cell.col] = cell.color
+    img.set_data(grid)
+
+    return img
 
 class Cell(object):
     def __init__(self, row_col, probLife):
@@ -29,8 +44,8 @@ def gridGenerator(N, tracking_grid):
     return grid, tracking_grid
 
 
-N = 10
-p = 0.5
+N = 100
+p = 0.8
 
 def main():
     # Declare object_grid:
@@ -38,14 +53,20 @@ def main():
 
     # Call Grid generatingfunction:
     grid, object_grid = gridGenerator(N, object_grid)
-
+    updateInterval = 50
     #for row in object_grid:
     #    for cell in row:
             # print(cell.color)
             # print(str(cell.row) + "  " + str(cell.col))
             # print(cell.countNeighbors(grid, cell.row, cell.col))
+    fig, ax = plt.subplots()
+    img = ax.imshow(grid, interpolation='nearest')
+    ani = animation.FuncAnimation(fig, letThereBeLife, fargs=(img, grid, object_grid),
+                                  frames=10,
+                                  interval=updateInterval,
+                                  save_count=50)
 
-    plt.imshow(grid, interpolation='nearest')
+
     plt.show()
 
 main()
